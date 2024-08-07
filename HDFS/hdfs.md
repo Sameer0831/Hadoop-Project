@@ -1,55 +1,84 @@
-### HDFS Overview
-HDFS (Hadoop Distributed File System) is the primary storage system used by Hadoop applications. It provides a distributed storage system designed to run on commodity hardware. HDFS is highly fault-tolerant and is designed to be deployed on low-cost hardware. It provides high throughput access to application data and is suitable for applications with large data sets.
+### HDFS: Hadoop Distributed File System
 
-### Key Features of HDFS
-1. **Scalability**: HDFS can scale to hundreds of nodes in a single cluster.
-2. **Fault Tolerance**: Data is replicated across multiple nodes to ensure reliability and fault tolerance.
-3. **High Throughput**: Optimized for large, streaming reads and writes.
-4. **Support for Large Files**: Designed to handle very large files that are divided into blocks.
+HDFS (Hadoop Distributed File System) is the primary storage system used by Hadoop applications. It provides high-throughput access to application data and is designed to store large datasets reliably, and to stream those datasets at high bandwidth to user applications.
 
-### How We Stored Our Data Files
-In this project, we utilized HDFS to store various data files, ensuring data availability and fault tolerance. Here’s a brief overview of how we managed our data files with HDFS:
+#### Key Features of HDFS
 
-1. **Uploading Data**: We used the `hdfs dfs -put` command to upload local data files to HDFS. For example:
-   ```sh
-   hdfs dfs -put /local/path/to/u.data /user/maria_dev/ml-100k/
-   ```
+1. **Fault Tolerance**:
+   - HDFS is designed to handle hardware failures gracefully. Data is replicated across multiple nodes to ensure that it remains accessible even if some nodes fail.
+   - The default replication factor is three, meaning that each data block is stored on three different nodes.
 
-2. **Data Organization**: Data files are organized in directories under the `/user/maria_dev` directory in HDFS, ensuring that all project data is stored in a structured manner.
+2. **Scalability**:
+   - HDFS can scale to petabytes of data and thousands of nodes. It is designed to handle very large files and to support large clusters of nodes.
+   - The architecture allows for horizontal scaling, which means adding more nodes to the cluster increases storage capacity and processing power.
 
-3. **Data Processing**: All processing components like Spark, Pig, Hive, and MapReduce accessed the data stored in HDFS, leveraging its distributed nature for efficient data processing.
+3. **Data Locality**:
+   - HDFS optimizes data access by moving computation to the location where the data resides, minimizing network congestion and improving processing speed.
+   - This is achieved through the rack-aware placement of data blocks.
 
-### Importance of HDFS
-HDFS plays a crucial role in the Hadoop ecosystem. Here are some reasons why HDFS is important:
+4. **High Throughput**:
+   - HDFS is optimized for high throughput of data access, making it suitable for batch processing rather than low-latency access to small chunks of data.
+   - It supports large-scale data processing applications like MapReduce, which require high data transfer rates.
 
-- **Reliability**: Data is replicated across multiple nodes to ensure no data loss in case of node failures.
-- **Scalability**: HDFS can handle scaling up and down seamlessly, making it suitable for large data sets and big data applications.
-- **Performance**: HDFS is designed to handle large data sets efficiently, providing high throughput and fast data access.
+5. **Streaming Data Access**:
+   - HDFS provides a streaming data access pattern, which is particularly suitable for applications that need to process large datasets sequentially.
+   - This design choice makes it ideal for write-once, read-many use cases.
 
-### Example Commands
-Here are some useful HDFS commands that we frequently used in our project:
+#### Important Considerations
 
-- **Uploading a File**:
-  ```sh
-  hdfs dfs -put /local/path/to/file /hdfs/path/to/directory
+- **Data Replication**: Data is automatically replicated to multiple nodes. The replication factor can be configured based on reliability requirements.
+- **Block Size**: HDFS breaks files into large blocks (default 128 MB), which are then distributed across the cluster.
+- **NameNode and DataNodes**: HDFS follows a master-slave architecture with a single NameNode managing metadata and multiple DataNodes storing actual data.
+
+#### Practical Implementation of HDFS in Our Project
+
+1. **Data Ingestion**: We used HDFS to store the MovieLens 100k dataset, ensuring it is distributed and fault-tolerant.
+2. **Data Access**: Various processing frameworks like MapReduce, Hive, Pig, Spark, and Tez accessed data directly from HDFS.
+3. **Replication**: Ensured data reliability by configuring appropriate replication factors for our data blocks.
+
+### Important Commands for HDFS
+
+Here are some key commands we used during our project to interact with HDFS:
+
+- **Uploading Data to HDFS**:
+  ```bash
+  hdfs dfs -put /local/path/to/dataset /hdfs/path/to/destination
   ```
 
-- **Listing Files**:
-  ```sh
+- **Listing Files in HDFS**:
+  ```bash
   hdfs dfs -ls /hdfs/path/to/directory
   ```
 
-- **Reading a File**:
-  ```sh
+- **Checking HDFS Disk Usage**:
+  ```bash
+  hdfs dfs -du -h /hdfs/path/to/directory
+  ```
+
+- **Reading a File from HDFS**:
+  ```bash
   hdfs dfs -cat /hdfs/path/to/file
   ```
 
-- **Removing a File**:
-  ```sh
+- **Removing a File from HDFS**:
+  ```bash
   hdfs dfs -rm /hdfs/path/to/file
   ```
 
-### Adding to the Repository
-Create a new file named `HDFS.md` in your repository and include the content above. This file will complement your existing documentation on Spark, Pig, Hive, Sqoop, and MapReduce, providing a comprehensive overview of the Hadoop ecosystem.
+- **Changing Replication Factor**:
+  ```bash
+  hdfs dfs -setrep -w 3 /hdfs/path/to/file_or_directory
+  ```
 
-By documenting HDFS and including it in your repository, you will provide a complete picture of how data storage and processing are managed within the Hadoop framework, enhancing the overall understanding for anyone referring to your project.
+- **Checking the Status of HDFS**:
+  ```bash
+  hdfs dfsadmin -report
+  ```
+
+### Points to Remember
+
+- **HDFS Setup**: Ensure HDFS is properly configured and running on your Hadoop cluster.
+- **Data Placement**: Pay attention to the replication factor and block size for optimal performance and reliability.
+- **Fault Tolerance**: Regularly monitor the health of DataNodes and the NameNode to prevent data loss.
+
+By leveraging HDFS, we ensured that our dataset was securely stored, easily accessible, and processed efficiently using various Hadoop components. This setup provided a robust foundation for our big data processing tasks.
